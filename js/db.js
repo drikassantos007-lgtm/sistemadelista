@@ -1,6 +1,3 @@
-/* Banco de dados (Firestore): cada pessoa tem o seu próprio documento
-   em listas/{uid}, então ninguém vê a lista de ninguém. */
-
 let _timer = null;
 
 function mostrarStatus(texto) {
@@ -13,7 +10,6 @@ async function carregarDaNuvem(uid) {
   return doc.exists ? JSON.parse(doc.data().dados) : null;
 }
 
-// Espera 0,4 s depois da última alteração para salvar (evita salvar a cada tecla)
 function salvarNaNuvem(estado) {
   const user = auth.currentUser;
   if (!user) return;
