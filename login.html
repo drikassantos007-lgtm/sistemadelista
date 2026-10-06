@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Entrar - Minhas Listas</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <section class="panel login">
+    <h2>📝 Minhas Listas</h2>
+    <p class="sub">Entre para ver suas listas em qualquer aparelho.</p>
+
+    <form id="form">
+      <input type="email" id="email" placeholder="E-mail" autocomplete="email" required>
+      <input type="password" id="senha" placeholder="Senha" autocomplete="current-password" required>
+      <p class="erro" id="erro" role="alert"></p>
+      <button class="go" type="submit">Entrar</button>
+      <button class="ic" type="button" id="criar">Criar conta</button>
+      <button class="ic" type="button" id="esqueci">Esqueci a senha</button>
+    </form>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const mostrarErro = (txt) => { $("erro").textContent = txt; };
+
+  esperarVisitante();
+
+  // Executa uma ação de login e mostra o erro, se houver
+  async function tentar(acao) {
+    mostrarErro("");
+    try {
+      await acao($("email").value.trim(), $("senha").value);
+    } catch (e) {
+      mostrarErro(traduzirErro(e.code));
+    }
+  }
+
+  $("form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    tentar(entrar);
+  });
+
+  $("criar").onclick = () => tentar(criarConta);
+
+  $("esqueci").onclick = async () => {
+    mostrarErro("");
+    const email = $("email").value.trim();
+    if (!email) return mostrarErro("Digite seu e-mail e clique de novo.");
+    try {
+      await recuperarSenha(email);
+      mostrarErro("Enviamos um e-mail para redefinir a senha.");
+    } catch (e) {
+      mostrarErro(traduzirErro(e.code));
+    }
+  };
+</script>
+</body>
+</html>
