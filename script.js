@@ -1,8 +1,7 @@
 const CHAVE = "listas-v1";
 
-
 const estadoInicial = () => ({
-  cur: 0, 
+  cur: 0, // índice da aba aberta
   tabs: [
     { name: "Levar",          items: [], f: "" },
     { name: "Comprar",        items: [], f: "" },
@@ -10,18 +9,13 @@ const estadoInicial = () => ({
   ]
 });
 
-let S; 
-try {
-  S = JSON.parse(localStorage.getItem(CHAVE)) || estadoInicial();
-} catch (e) {
-  S = estadoInicial();
-}
+let S = estadoInicial(); 
 
-const salvar = () => {
-  try {
-    localStorage.setItem(CHAVE, JSON.stringify(S));
-  } catch (e) {}
+const dadosAntigos = () => {
+  try { return JSON.parse(localStorage.getItem(CHAVE)); } catch (e) { return null; }
 };
+
+const salvar = () => salvarNaNuvem(S);
 
 let editando = null; 
 
@@ -89,21 +83,29 @@ function htmlItem(item, idx, opcoesAbas) {
     </li>`;
 }
 
+
+/* ---------- 4. TELA (RENDER) ---------- */
+
 function render() {
   const aba = S.tabs[S.cur];
 
+  // Abas no topo
   $("tabs").innerHTML = htmlAbas();
 
+  // Sugestões de categoria (de todas as abas)
   const todasCategorias = unicas(S.tabs.flatMap((t) => t.items.map((i) => i.cat)));
   $("cats").innerHTML = todasCategorias.map((c) => `<option value="${esc(c)}">`).join("");
 
+  // Categorias da aba atual (viram os botões de filtro)
   const categoriasDaAba = unicas(aba.items.map((i) => i.cat));
   if (aba.f && !categoriasDaAba.includes(aba.f)) aba.f = "";
 
+  // Itens visíveis, respeitando o filtro
   const visiveis = aba.items
     .map((item, idx) => ({ item, idx }))
     .filter((o) => !aba.f || o.item.cat === aba.f);
 
+  // Opções do "Mover…" (todas as abas, menos a atual)
   const opcoesAbas = S.tabs
     .map((t, i) => (i == S.cur ? "" : `<option value="${i}">${esc(t.name)}</option>`))
     .join("");
@@ -133,7 +135,7 @@ function render() {
 }
 
 function ligarEventosDoPainel(aba) {
-
+ 
   const titulo = $("ttl");
   titulo.onblur = () => {
     aba.name = titulo.textContent.trim() || aba.name;
@@ -186,20 +188,20 @@ document.addEventListener("click", (e) => {
   const aba = S.tabs[S.cur];
   if (!d) return;
 
-  if (d.tab !== undefined) {               
+  if (d.tab !== undefined) {                
     S.cur = +d.tab;
     editando = null;
 
   } else if (d.f !== undefined && e.target.classList.contains("chip")) {
-    aba.f = d.f;                            
-  } else if (d.del !== undefined) {          
+    aba.f = d.f;                           
+  } else if (d.del !== undefined) {         
     if (!confirm("Excluir este item?")) return;
     aba.items.splice(+d.del, 1);
 
   } else if (d.edit !== undefined) {         
     editando = aba.items[+d.edit].id;
 
-  } else if (d.cancel !== undefined) {       
+  } else if (d.cancel !== undefined) {      
     editando = null;
 
   } else if (d.save !== undefined) {         
@@ -209,11 +211,11 @@ document.addEventListener("click", (e) => {
     item.cat = $("ec").value.trim();
     editando = null;
 
-  } else if (d.up !== undefined) {           
+  } else if (d.up !== undefined) {         
     const i = +d.up;
     if (i > 0) [aba.items[i - 1], aba.items[i]] = [aba.items[i], aba.items[i - 1]];
 
-  } else if (d.dn !== undefined) {           
+  } else if (d.dn !== undefined) {
     const i = +d.dn;
     if (i < aba.items.length - 1) [aba.items[i + 1], aba.items[i]] = [aba.items[i], aba.items[i + 1]];
 
@@ -229,11 +231,11 @@ document.addEventListener("change", (e) => {
   const d = e.target.dataset;
   const aba = S.tabs[S.cur];
 
-  if (d.chk !== undefined) {               
+  if (d.chk !== undefined) {                 
     aba.items[+d.chk].done = e.target.checked;
 
   } else if (d.to !== undefined && e.target.value !== "") {
-    const [item] = aba.items.splice(+d.to, 1); 
+    const [item] = aba.items.splice(+d.to, 1);
     S.tabs[+e.target.value].items.push(item);
 
   } else {
@@ -244,4 +246,15 @@ document.addEventListener("change", (e) => {
   render();
 });
 
-render();
+$("sair").onclick = sair;
+
+esperarLogin(async (user) => {
+  try {
+    const nuvem = await carregarDaNuvem(user.uid);
+    S = nuvem || dadosAntigos() || estadoInicial();
+    if (!nuvem) salvar();
+  } catch (e) {
+    mostrarStatus("Não foi possível carregar suas listas.");
+  }
+  render();
+});
