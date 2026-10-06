@@ -1,12 +1,12 @@
 :root {
-  --blue:     #a7d8f5; 
-  --blue-d:   #5fb0e0;  
-  --yellow:   #ffe680;  
-  --yellow-d: #f2c94c;  
+  --blue:     #a7d8f5;  
+  --blue-d:   #5fb0e0; 
+  --yellow:   #ffe680; 
+  --yellow-d: #f2c94c; 
   --bg:       #f4fbff;  
   --card:     #fff;     
-  --ink:      #2b3a45;  
-  --mute:     #7a8b97;  
+  --ink:      #2b3a45; 
+  --mute:     #7a8b97; 
   --line:     #d9ecf7;  
 
   box-sizing: border-box;
@@ -93,7 +93,6 @@ h1 {
   opacity: 1;
 }
 
-
 .panel {
   padding: 14px;
   background: var(--card);
@@ -167,7 +166,7 @@ button.go {
 }
 
 .add .t { flex: 2 1 160px; }  
-.add .c { flex: 1 1 110px; }  
+.add .c { flex: 1 1 110px; } 
 
 .chips {
   display: flex;
@@ -258,4 +257,48 @@ input[type=checkbox] {
   margin-top: 12px;
   background: var(--card);
   border-radius: 12px;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.topo h1 {
+  margin: 4px 0 14px;
+}
+
+.topo .ic {
+  background: var(--card);
+}
+
+.login {
+  max-width: 380px;
+  margin: 12vh auto 0;
+  border-radius: 18px;
+}
+
+.login h2 {
+  margin: 0 0 4px;
+}
+
+.login .sub {
+  margin: 0 0 14px;
+  color: var(--mute);
+  font-size: .9rem;
+}
+
+.login form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.login .erro {
+  min-height: 1.2em;
+  margin: 0;
+  color: #c0392b;
+  font-size: .85rem;
 }
