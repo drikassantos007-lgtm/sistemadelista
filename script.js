@@ -1,7 +1,7 @@
 const CHAVE = "listas-v1";
 
 const estadoInicial = () => ({
-  cur: 0, // índice da aba aberta
+  cur: 0,
   tabs: [
     { name: "Levar",          items: [], f: "" },
     { name: "Comprar",        items: [], f: "" },
@@ -83,29 +83,21 @@ function htmlItem(item, idx, opcoesAbas) {
     </li>`;
 }
 
-
-/* ---------- 4. TELA (RENDER) ---------- */
-
 function render() {
   const aba = S.tabs[S.cur];
 
-  // Abas no topo
   $("tabs").innerHTML = htmlAbas();
 
-  // Sugestões de categoria (de todas as abas)
   const todasCategorias = unicas(S.tabs.flatMap((t) => t.items.map((i) => i.cat)));
   $("cats").innerHTML = todasCategorias.map((c) => `<option value="${esc(c)}">`).join("");
 
-  // Categorias da aba atual (viram os botões de filtro)
   const categoriasDaAba = unicas(aba.items.map((i) => i.cat));
   if (aba.f && !categoriasDaAba.includes(aba.f)) aba.f = "";
 
-  // Itens visíveis, respeitando o filtro
   const visiveis = aba.items
     .map((item, idx) => ({ item, idx }))
     .filter((o) => !aba.f || o.item.cat === aba.f);
 
-  // Opções do "Mover…" (todas as abas, menos a atual)
   const opcoesAbas = S.tabs
     .map((t, i) => (i == S.cur ? "" : `<option value="${i}">${esc(t.name)}</option>`))
     .join("");
