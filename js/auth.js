@@ -1,6 +1,3 @@
-/* Login, cadastro e proteção das páginas */
-
-// Páginas protegidas: se não estiver logada, vai para o login
 function esperarLogin(aoLogar) {
   auth.onAuthStateChanged((user) => {
     if (user) aoLogar(user);
@@ -8,7 +5,6 @@ function esperarLogin(aoLogar) {
   });
 }
 
-// Página de login: se já estiver logada, vai direto para as listas
 function esperarVisitante() {
   auth.onAuthStateChanged((user) => {
     if (user) location.href = "index.html";
@@ -20,7 +16,6 @@ const criarConta = (email, senha) => auth.createUserWithEmailAndPassword(email, 
 const recuperarSenha = (email) => auth.sendPasswordResetEmail(email);
 const sair = () => auth.signOut();
 
-// Mensagens de erro em português
 function traduzirErro(codigo) {
   const erros = {
     "auth/invalid-email": "E-mail inválido.",
